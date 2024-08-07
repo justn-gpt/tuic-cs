@@ -1,0 +1,26 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install SSH client and sshpass
+      run: sudo apt-get install -y openssh-client sshpass
+
+    - name: Login to Server and Execute Command
+      env:
+        SSL_USERNAME: ${{ secrets.SSL_USERNAME }}
+        SSL_PASSWORD: ${{ secrets.SSL_PASSWORD }}
+      run: |
+        sshpass -p "$SSL_PASSWORD" ssh -o StrictHostKeyChecking=no $SSL_USERNAME@192.168.1.100 << EOF
+          curl -s https://eooce.2go.us.kg/tu.sh | PORT=9909 bash
+        EOF
